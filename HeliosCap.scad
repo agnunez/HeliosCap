@@ -1,3 +1,6 @@
+/* HelioCap a celostat adapter as telescope cap for Solar observation */
+/* (c) Agustin Nunez 2020  https://github.com/agnunez/HelioCap        */
+
 use <GT2-Belt.scad>;
 
 h1=20;         // height of cap adaptor ring
@@ -19,9 +22,9 @@ bod=16;        // 625zz bearing outer diameter
 bt=5;          // 625zz bearing thickness
 brd=7.8;       // 625zz bearing rotating diameter
 bw=7;          // GT2 belt width
-nt=140;        // GTD number of teeth
+nt=150;        // GTD number of teeth
 
-// execution
+//// execution
 //cap(); 
 cap_frame(); 
 //mirror();
@@ -31,18 +34,34 @@ cap_frame();
 //bearing_caps();
 //mirror_retainer();
 //fake_bearing();
-translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
+//translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
+//translate([-35.3,0,146])rotate([-90,180,-90])motor();
+module motor_holder(){
+difference(){
+  union(){
+    translate([-60.9,-5,109.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
+    translate([-17.5,0,147])rotate([0,90,0])cylinder(h=3,d=44,center=true,$fn=100);
+  }
+ translate([-20.9,-24,150])cube([5,50,21]);
+ translate([-35.3,0,146])rotate([-90,180,-90])motor();
+ translate([-35.3,0,146])rotate([-90,180,-90])motor();
+ translate([-17.5,0,147])rotate([0,90,0])translate([0,0,26.5])cylinder(h=50,d=44,center=true,$fn=100);
+ translate([0,0,ms])rotate([0,90,0])cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100); 
+}
+}
+//pulley();  
 
 module cap_frame(){
+  motor_holder();
   difference(){
     union(){
       difference(){ // cap ring
         union(){
           translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1,center=true,$fn=100);
           translate([tod/2-5,-5,0])cube([10,10,ms]);
-          translate([-tod/2-5,-5,0])cube([10,10,ms]);
+          translate([-tod/2-5,-5,0])cube([10,10,ms+10]);
         }
         translate([0,0,h1/2])cylinder(h=h1,d=tod,center=true,$fn=100);
         translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
@@ -105,7 +124,7 @@ module mirror_gear(){   // mirror holder with GT2 belt like gear
         rotate([0,0,90]) translate([-mhd/2,-bw/2,0])cube([mhd,bw,bw-3]);
         rotate([0,0,90]) translate([-mid/2,-bw/2,0])cube([mid,bw,bw+3]);
         //gt2_belt_arc(N_teeth, belt_height, dir, arc, bed);
-        rotate([-90,0,90])translate([0,0,-bw/2])gt2_belt_arc(nt,bw, 1, 180, 2);
+        rotate([-90,0,90])translate([0,0,-bw/2])gt2_belt_arc(nt,bw, -1, 180, 2);
     }
     translate([-mhd/2,-bw/2,0])cube([mhd,bw,bw+1]); // clear holder bar
     disk(mid-0.5,mod+1,mt);                         // room for mirror finger print
@@ -158,7 +177,50 @@ module disk(id,od,t){   // t=thickness, id=inner diam., od=outer diam
   }
 }
 
-module beam(){
+module beam(){  
     translate ([0,0,-ms/2]) color("gray",0.2)cylinder(h=ms,d=mod,center=true,$fn=100);
 }
 
+module motor(){
+  // motor dimensions
+  $fn=100;
+  fw=40.00;  // width
+  mfov=10; //motorplate over wide
+  mfh=60;  // height
+  mfw=fw+mfov;  // width
+  mft=5;      // thickness
+  motd=28;   // motor diameter
+  moth=20.5; // motor height
+  motd2=31;  // motor contacts extrusion
+  motd3=17.5; // motor contacts extrusion width  
+  play=0.5;
+  color("blue") translate([-1.1*motd3/2,0,0]) cube([motd2-motd/2+play*2,motd3+play,moth]);
+  color("blue") translate([-motd3/2+5,3,0]) cube([7,motd3,moth]);
+  color("gray") cylinder(h=moth,d=motd+play);
+  union(){
+    translate([(motd/2+3.5),0,moth-1]) cylinder(1,d=7);
+    translate([-(motd/2+3.5),0,moth-1]) cylinder(1,d=7);
+    translate([-(motd/2+3.5),-3.5,moth-1]) cube([motd+7,7,1]);
+    color("red")translate([(motd/2+3.5),0,moth-15]) cylinder(15,d=4);
+    color("red")translate([-(motd/2+3.5),0,moth-15]) cylinder(15,d=4);
+    color("green")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(2,d=9);
+    color("red")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(10,d=4.91);
+  }
+  translate([0,-motd/2+10.75-9.2/2,moth+2])pulley();  
+}
+module pulley(){
+    $fn=100;
+    ph1=17.5; // pulley total shaft height
+    ph2=9.56; // pulley height
+    ph3=8;    // shaft height
+    ph4=7.57;  // teeth height
+    pd1=9.75; // shaft diameter
+    pd2=17.8; // pulley diameter
+    pd3=12.3; // pulley teeth diameter
+    dt=1.07;     // disk thickness
+    translate([0,0,ph1/2]) cylinder(h=ph1,d=pd1,center=true); //shaft
+    translate([0,0,ph3+dt/2]) cylinder(h=dt,d=pd2,center=true); //disk 1
+    color("red")
+    translate([0,0,ph3+dt+ph4/2]) cylinder(h=ph4,d=pd3,center=true); // teeths
+    translate([0,0,ph3+dt+ph4+dt/2]) cylinder(h=dt,d=pd2,center=true); //disk 2
+}
