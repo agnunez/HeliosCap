@@ -4,6 +4,8 @@ This is a "poorman" **heliostat** (solar celostat) that allows tracking the Sun 
 
 ![GitHub Logo](/HeliosCap.gif)
 
+![GitHub Logo](/HeliosCapFrame.gif)
+
 It was designed during covid19 lock down in a small Atlantic island (La Palma), so no shopping was possible and only reuse of material available at home was feasible. I had a bunch of obsoletes 5" disk drives and knew that they are well polished, to avoid reading head crash so that was first choice to look for a flat mirror. Furthermore, even though their reflectivity is only around 60%, the Sun is really bright so the light lost after reflection even helps to reduce filters requirements and heat. In near future, hopeful when the lock down is over I hope to replace the mirror with a Newton Secondary elliptical one, and use a APO refractor lens to avoid central obstruction and obtain more contrast in resulting images.
 
 The project is at testing phase, but the intention is to develop autonomous software to locate, track and even guide the Sun every day during the year, even in partially cloudy skies.
