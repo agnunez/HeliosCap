@@ -3,8 +3,8 @@
 
 use <GT2-Belt.scad>;
 
-h1=20;         // height of cap adaptor ring
-tod=110;       // telescope tube outer diameter
+h1=30;         // height of cap adaptor ring
+tod=111.4;     // telescope tube outer diameter. Using 0.2mm sheet twice to better slipage
 w1=2;          // cap wall thickness
 w2=2;          // mirror baffle thickness(black);
 mod=95;        // flat mirror outer diameter.
@@ -13,7 +13,7 @@ a=sin(360*$t); // parameter for animation (-1..1)
 dec=23.5*a;    // Ecliptic inclination 23º 27' 8" (47" less every 100y)
 mt=1.26;       // mirror thickness
 ma=45-dec/2;   // mirror angle
-ms=100;        // mirror spacing from telescope 
+ms=80+h1;      // mirror spacing from telescope 
 h2=ms+mod*0.6; // baffle height
 bm=3.0;        // beam margin. free space around beam
 d2=98.5;       // telescope original cap insercion diameter
@@ -38,20 +38,23 @@ cap_frame();
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
 //translate([-35.3,0,146])rotate([-90,180,-90])motor();
+//pulley20();  
+echo(ms+47);
+
 module motor_holder(){
 difference(){
   union(){
-    translate([-60.9,-5,109.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
-    translate([-17.5,0,147])rotate([0,90,0])cylinder(h=3,d=44,center=true,$fn=100);
+    translate([-60.9,-5,ms+9.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
+    translate([-17.5,0,ms+47])rotate([0,90,0])cylinder(h=3,d=44,center=true,$fn=100);
   }
- translate([-20.9,-24,150])cube([5,50,21]);
- translate([-35.3,0,146])rotate([-90,180,-90])motor();
- translate([-35.3,0,146])rotate([-90,180,-90])motor();
- translate([-17.5,0,147])rotate([0,90,0])translate([0,0,26.5])cylinder(h=50,d=44,center=true,$fn=100);
+ translate([-20.9,-24,ms+50])cube([5,50,21]);
+ translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
+ translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
+ translate([-17.5,0,ms+47])rotate([0,90,0])translate([0,0,26.5])cylinder(h=50,d=44,center=true,$fn=100);
  translate([0,0,ms])rotate([0,90,0])cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100); 
 }
 }
-//pulley();  
+
 
 module cap_frame(){
   motor_holder();
@@ -59,7 +62,7 @@ module cap_frame(){
     union(){
       difference(){ // cap ring
         union(){
-          translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1,center=true,$fn=100);
+          translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2,center=true,$fn=100);
           translate([tod/2-5,-5,0])cube([10,10,ms]);
           translate([-tod/2-5,-5,0])cube([10,10,ms+10]);
         }
@@ -78,7 +81,7 @@ module cap_frame(){
 
 module cap(){
   difference(){ // cap ring
-    translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1,center=true,$fn=100);
+    translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2,center=true,$fn=100);
     translate([0,0,h1/2])cylinder(h=h1,d=tod,center=true,$fn=100);
     translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
   }
@@ -206,9 +209,9 @@ module motor(){
     color("green")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(2,d=9);
     color("red")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(10,d=4.91);
   }
-  translate([0,-motd/2+10.75-9.2/2,moth+2])pulley();  
+  translate([0,-motd/2+10.75-9.2/2,moth+2])pulley20();  
 }
-module pulley(){
+module pulley20(){
     $fn=100;
     ph1=17.5; // pulley total shaft height
     ph2=9.56; // pulley height
@@ -223,4 +226,5 @@ module pulley(){
     color("red")
     translate([0,0,ph3+dt+ph4/2]) cylinder(h=ph4,d=pd3,center=true); // teeths
     translate([0,0,ph3+dt+ph4+dt/2]) cylinder(h=dt,d=pd2,center=true); //disk 2
+    //translate([0,0,ph3+dt])gt2_belt_arc(20,ph4, 1, 360, 0);
 }
