@@ -37,34 +37,37 @@ cap_frame();
 //translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
-//translate([-35.3,0,146])rotate([-90,180,-90])motor();
+translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
 //pulley20();  
-echo(ms+47);
+
+
 
 module motor_holder(){
 difference(){
   union(){
     translate([-60.9,-5,ms+9.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
     translate([-17.5,0,ms+47])rotate([0,90,0])cylinder(h=3,d=44,center=true,$fn=100);
+      
   }
  translate([-20.9,-24,ms+50])cube([5,50,21]);
- translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
  translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
  translate([-17.5,0,ms+47])rotate([0,90,0])translate([0,0,26.5])cylinder(h=50,d=44,center=true,$fn=100);
  translate([0,0,ms])rotate([0,90,0])cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100); 
 }
+  //translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
 }
 
 
 module cap_frame(){
   motor_holder();
+  gt2_belt_arc(60*3,bw, 1, 360, 2);
   difference(){
     union(){
       difference(){ // cap ring
         union(){
           translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2,center=true,$fn=100);
-          translate([tod/2-5,-5,0])cube([10,10,ms]);
-          translate([-tod/2-5,-5,0])cube([10,10,ms+10]);
+          translate([tod/2-5,-5,bw+2])cube([10,10,ms-2]);
+          translate([-tod/2-5,-5,bw+2])cube([10,10,ms+8-bw]);
         }
         translate([0,0,h1/2])cylinder(h=h1,d=tod,center=true,$fn=100);
         translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
