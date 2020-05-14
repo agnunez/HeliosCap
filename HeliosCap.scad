@@ -4,7 +4,9 @@
 use <GT2-Belt.scad>;
 
 h1=30;         // height of cap adaptor ring
-tod=111.4;     // telescope tube outer diameter. Using 0.2mm sheet twice to better slipage
+tod=110;       // telescope tube outer diameter. 
+toh=35;        // telescope tube last cylinder height
+d2=98.5;       // telescope original cap insercion diameter
 w1=2;          // cap wall thickness
 w2=2;          // mirror baffle thickness(black);
 mod=95;        // flat mirror outer diameter.
@@ -16,13 +18,20 @@ ma=45-dec/2;   // mirror angle
 ms=80+h1;      // mirror spacing from telescope 
 h2=ms+mod*0.6; // baffle height
 bm=3.0;        // beam margin. free space around beam
-d2=98.5;       // telescope original cap insercion diameter
 bid=5;         // 625zz bearing inner diameter
 bod=16;        // 625zz bearing outer diameter
 bt=5;          // 625zz bearing thickness
 brd=7.8;       // 625zz bearing rotating diameter
 bw=7;          // GT2 belt width
-nt=150;        // GTD number of teeth
+dec_teeth=150; // GT2 teeth on DEC gear
+ra_teeth=60*4; // GT2 teeth on RA gear
+wd1=15.25;
+wd2=13;
+wt1=5;
+wt2=8.96;  // wheel thickness
+wh=4.9;  // bearing hole diameter
+wbd=10;  // bearing diameter
+ $fn=100;
 
 //// execution
 //cap(); 
@@ -34,15 +43,59 @@ cap_frame();
 //bearing_caps();
 //mirror_retainer();
 //fake_bearing();
-//translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
+translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
+//translate([-35.3,0,ms+46])rotate([-90,180,-90])motor(); // dec motor
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
-translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
 //pulley20();  
+//ra_motor_holder();
+//translate([0,tod/2+16,-32])motor(); // ra motor
+translate([0,0,h1])telescope();
+ra_bearing();
+module ra_bearing(){
+  rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel();
+  rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel();
+  rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel();
+}
+module vslot_wheel(){
+ difference(){
+  union(){
+    color("black")cylinder(h=(wt2-wt1)/2-0.2,d2=wd1,d1=wd2);
+    color("black")translate([0,0,(wt2-wt1)/2])cylinder(h=wt1,d=wd1);
+    color("black")translate([0,0,(wt2-wt1)/2+wt1])cylinder(h=(wt2-wt1)/2-0.2,d1=wd1,d2=wd2);
+    color("gray")translate([0,0,-0.1])cylinder(h=wt2,d=wbd);
+  }
+  translate([0,0,-1])cylinder(h=wt2+2,d=wh);
+  
+ }
+}
 
+module telescope(){
+    translate([0,0,-toh/2]) union(){
+     color("gray")difference(){
+      cylinder(h=toh,d=tod,center=true,$fn=100);
+      cylinder(h=toh+1,d=d2,center=true,$fn=100);
+     }
+     translate([0,0,-(toh+8.5)/2])color("black")cylinder(h=8.5,d=tod-2,center=true,$fn=100);
+     color("gray")translate([0,0,-8.5-(toh+140)/2])cylinder(h=140,d=tod-1,center=true,$fn=100);
+   }
+}
 
-
-module motor_holder(){
+module ra_motor_holder(){
+  translate([0,0,-18]) difference(){
+    union(){
+      cylinder(h=10,d=tod+1,center=true,$fn=100);
+      translate([-21,tod/2-5,-5])cube([42,27,10]);
+      rotate([0,0,180])translate([-5,tod/2-5,-5])cube([10,15,10]);
+      translate([0,50,0])rotate([0,90,0])cylinder(h=20,d=3,center=true,$fn=100);  
+    }    
+    cylinder(h=10+1,d=tod-4,center=true,$fn=100);
+    rotate([0,0,180])translate([-1.5,tod/2-5-2,-7])cube([3,20,20]);
+    translate([0,tod/2+16,-14])motor();
+    translate([0,-tod/2-6,0])rotate([0,90,0])cylinder(h=20,d=3,center=true,$fn=100);  
+  }
+}
+module dec_motor_holder(){
 difference(){
   union(){
     translate([-60.9,-5,ms+9.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
@@ -59,8 +112,8 @@ difference(){
 
 
 module cap_frame(){
-  motor_holder();
-  gt2_belt_arc(60*3,bw, 1, 360, 2);
+  dec_motor_holder();
+  gt2_belt_arc(ra_teeth,bw, 1, 360, 2);
   difference(){
     union(){
       difference(){ // cap ring
@@ -104,7 +157,7 @@ module cap(){
 module mirror_assembly(){
   mirror();
   mirror_holder();
-  mirror_gear();
+  mirror_gear(); 
 }
 
 module fake_bearing(){
@@ -130,7 +183,7 @@ module mirror_gear(){   // mirror holder with GT2 belt like gear
         rotate([0,0,90]) translate([-mhd/2,-bw/2,0])cube([mhd,bw,bw-3]);
         rotate([0,0,90]) translate([-mid/2,-bw/2,0])cube([mid,bw,bw+3]);
         //gt2_belt_arc(N_teeth, belt_height, dir, arc, bed);
-        rotate([-90,0,90])translate([0,0,-bw/2])gt2_belt_arc(nt,bw, -1, 180, 2);
+        rotate([-90,0,90])translate([0,0,-bw/2])gt2_belt_arc(dec_teeth,bw, -1, 180, 2);
     }
     translate([-mhd/2,-bw/2,0])cube([mhd,bw,bw+1]); // clear holder bar
     disk(mid-0.5,mod+1,mt);                         // room for mirror finger print
