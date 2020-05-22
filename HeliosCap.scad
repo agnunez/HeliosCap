@@ -2,7 +2,6 @@
 /* (c) Agustin Nunez 2020  https://github.com/agnunez/HelioCap        */
 
 use <GT2-Belt.scad>;
-pi=3.141592;
 h1=30;         // height of cap adaptor ring
 tod=110;       // telescope tube outer diameter. 
 toh=35;        // telescope tube last cylinder height
@@ -25,7 +24,7 @@ brd=7.8;       // 625zz bearing rotating diameter
 bw=7;          // GT2 belt width
 dec_teeth=150; // GT2 teeth on DEC gear
 ra_teeth=60*4; // GT2 teeth on RA gear
-ra_d=2*ra_teeth/pi;     //l=2pr  r=ra_teeth*2/(2p)*2
+ra_d=2*ra_teeth/PI;   // ra diameter. l=ra_teeth*2 in GT2. l=2*PI*r  r=ra_teeth*2/(2PI)*2
 wd1=15.25;
 wd2=13;
 wt1=5;
@@ -34,10 +33,10 @@ wh=4.9;   // bearing hole diameter
 wbd=10;   // bearing diameter
 wht=3;    //wheel holder thickness
 $fn=100;
+bs=1.1;  // bearing scale to allocate hollow room in cap for play 
 
 //// execution
 //cap(); 
-cap_frame(); 
 //mirror();
 //mirror_holder();
 //mirror_gear();
@@ -53,20 +52,20 @@ cap_frame();
 //ra_motor_holder();
 //translate([0,tod/2+16,-32])motor(); // ra motor
 //**translate([0,0,h1])telescope();
-//ra_bearing(1);
-bs=1.1; 
+//ra_bearing(1,a=1);
+cap_frame(); 
 
-module ra_bearing(s){ 
+module ra_bearing(s,a){ 
    translate([0,0,wht])union(){
-    rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
-    rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
-    rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
+    rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
+    rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
+    rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
   }
-  translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
-  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
-  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
+  translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
+  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
+  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
 }
-module vslot_wheel(s){
+module vslot_wheel(s,a){
  scale([s,s,s])
  difference(){
   union(){
@@ -78,6 +77,7 @@ module vslot_wheel(s){
   translate([0,0,-1])cylinder(h=wt2+2,d=wh);
   
  }
+ if(a==1){color("red")translate([0,0,-5])cylinder(h=wt2+10,d=wh);}
 }
 
 module telescope(){
@@ -132,6 +132,9 @@ module cap_frame(){
           s=7; // enlargment fix
           translate([tod/2-5,-5,bw+2-s])cube([10,10,ms-2+s]);
           translate([-tod/2-5,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
+          rotate([0,0,-30])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
+          rotate([0,0,90])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
+          rotate([0,0,210])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
           difference(){   //  hollow plate holding RA gear
             cylinder(h=wht,d=ra_d+1);
             for (i = [0:30:360]) { 
@@ -143,7 +146,8 @@ module cap_frame(){
         }
         translate([0,0,h1/2])cylinder(h=h1,d=tod+1,center=true,$fn=100);
         translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
-        ra_bearing(bs);
+        ra_bearing(1,a=1);
+        ra_bearing(bs,a=0);
       }  
       translate([0,0,ms])rotate([-ma,0,0]) 
       union(){
