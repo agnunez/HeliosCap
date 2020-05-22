@@ -37,7 +37,7 @@ $fn=100;
 
 //// execution
 //cap(); 
-#cap_frame(); 
+cap_frame(); 
 //mirror();
 //mirror_holder();
 //mirror_gear();
@@ -52,26 +52,22 @@ $fn=100;
 //pulley20();  
 //ra_motor_holder();
 //translate([0,tod/2+16,-32])motor(); // ra motor
-translate([0,0,h1])telescope();
-ra_bearing();
+//**translate([0,0,h1])telescope();
+//ra_bearing(1);
+bs=1.1; 
 
-module ra_bearing(){
+module ra_bearing(s){ 
    translate([0,0,wht])union(){
-    rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel();
-    rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel();
-    rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel();
+    rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
+    rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
+    rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel(s);
   }
-  difference(){
-  cylinder(h=wht,d=ra_d+1);
-   for (i = [0:30:360]) { 
-    rotate([0,0,i+15])translate([0,ra_d/2-(ra_d-tod)/4,0])translate([0,0,-1])cylinder(h=wht+2,d=(ra_d-tod)/2);
-   }
-  }
-  translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel();
-  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel();
-  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel();
+  translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
+  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
+  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s);
 }
-module vslot_wheel(){
+module vslot_wheel(s){
+ scale([s,s,s])
  difference(){
   union(){
     color("black")cylinder(h=(wt2-wt1)/2-0.2,d2=wd1,d1=wd2);
@@ -133,19 +129,30 @@ module cap_frame(){
       difference(){ // cap ring
         union(){
           translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2,center=true,$fn=100);
-          translate([tod/2-5,-5,bw+2])cube([10,10,ms-2]);
-          translate([-tod/2-5,-5,bw+2])cube([10,10,ms+8-bw]);
+          s=7; // enlargment fix
+          translate([tod/2-5,-5,bw+2-s])cube([10,10,ms-2+s]);
+          translate([-tod/2-5,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
+          difference(){   //  hollow plate holding RA gear
+            cylinder(h=wht,d=ra_d+1);
+            for (i = [0:30:360]) { 
+              rotate([0,0,i+15])translate([0,ra_d/2-(ra_d-tod)/4,0])
+                translate([0,0,-1])cylinder(h=wht+2,d=(ra_d-tod)/2);
+            }
+            translate([0,0,-1])cylinder(h=wht+2,d=tod+1);
+          }
         }
-        translate([0,0,h1/2])cylinder(h=h1,d=tod,center=true,$fn=100);
+        translate([0,0,h1/2])cylinder(h=h1,d=tod+1,center=true,$fn=100);
         translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
+        ra_bearing(bs);
       }  
       translate([0,0,ms])rotate([-ma,0,0]) 
       union(){
-        translate([mod/2+0.5,0,0])rotate([0,90,0]) bearing_caps();
+        translate([mod/2+0.5,0,0])rotate([0,90,0]) bearing_caps();  // dec bearing holders
         translate([-mod/2-0.5,0,0])rotate([0,-90,0]) bearing_caps();   
       }
     }
-  translate([0,0,ms])rotate([0,90,0])cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100);
+    translate([0,0,ms])rotate([0,90,0])                       // dec bearing axis 
+    cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100);
   }
 }
 
