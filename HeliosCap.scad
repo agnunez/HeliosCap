@@ -33,27 +33,27 @@ wh=4.9;   // bearing hole diameter
 wbd=10;   // bearing diameter
 wht=3;    //wheel holder thickness
 $fn=100;
-bs=1.1;  // bearing scale to allocate hollow room in cap for play 
+bs=1.2;  // bearing scale to allocate hollow room in cap for play 
 
 //// execution
-//cap(); 
 //mirror();
-//mirror_holder();
-//mirror_gear();
-//mirror_shaft();
+//***mirror_holder();  // uncomment to generate mirror holder stl
+//***mirror_gear();    // uncomment to generate mirror gear stl
+//***mirror_shaft();   // uncomment to generate mirror central  piece
 //bearing_caps();
-//mirror_retainer();
+//***mirror_retainer();
 //fake_bearing();
 //**translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
 //translate([-35.3,0,ms+46])rotate([-90,180,-90])motor(); // dec motor
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
 //pulley20();  
-//ra_motor_holder();
 //translate([0,tod/2+16,-32])motor(); // ra motor
-//**translate([0,0,h1])telescope();
+//***translate([0,0,h1])telescope();  // uncomment to draw OTA
 //ra_bearing(1,a=1);
-cap_frame(); 
+cap_frame();           //*** uncomment to generate cap_frame main gear stl
+//ra_motor_holder();     //*** uncoment to generat RA motor holder stl
+
 
 module ra_bearing(s,a){ 
    translate([0,0,wht])union(){
@@ -61,9 +61,9 @@ module ra_bearing(s,a){
     rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
     rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
   }
-  translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
-  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
-  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.6])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
+  translate([0,tod/2-w2,toh+w1+0.4])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
+  rotate([0,0,120])translate([0,tod/2-w2,toh+w1+0.4])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
+  rotate([0,0,-120])translate([0,tod/2-w2,toh+w1+0.4])rotate([90,0,0])translate([0,0,-wt2/2])vslot_wheel(s,a);
 }
 module vslot_wheel(s,a){
  scale([s,s,s])
@@ -77,7 +77,7 @@ module vslot_wheel(s,a){
   translate([0,0,-1])cylinder(h=wt2+2,d=wh);
   
  }
- if(a==1){color("red")translate([0,0,-5])cylinder(h=wt2+10,d=wh);}
+ if(a==1){color("red")translate([0,0,-10])cylinder(h=wt2+20,d=wh);}
 }
 
 module telescope(){
@@ -94,16 +94,19 @@ module telescope(){
 module ra_motor_holder(){
   translate([0,0,-18]) difference(){
     union(){
-      cylinder(h=10,d=tod+1,center=true,$fn=100);
-      translate([-21,tod/2-5,-5])cube([42,27,10]);
+      cylinder(h=10,d=tod+2.5,center=true,$fn=100);
+      translate([-21,tod/2-5,-5])cube([42,27+6,10]);
       rotate([0,0,180])translate([-5,tod/2-5,-5])cube([10,15,10]);
       translate([0,50,0])rotate([0,90,0])cylinder(h=20,d=3,center=true,$fn=100);  
     }    
-    cylinder(h=10+1,d=tod-4,center=true,$fn=100);
+    cylinder(h=10+1,d=tod-4+1.2,center=true,$fn=100);
     rotate([0,0,180])translate([-1.5,tod/2-5-2,-7])cube([3,20,20]);
-    translate([0,tod/2+16,-14])motor();
-    translate([0,-tod/2-6,0])rotate([0,90,0])cylinder(h=20,d=3,center=true,$fn=100);  
+    translate([0,tod/2+16+5,-14])rotate([0,0,180])motor();
+    translate([0,tod/2+16+6,-14])rotate([0,0,180])motor();
+    translate([0,-tod/2-6,0])rotate([0,90,0])cylinder(h=20,d=3.2,center=true,$fn=100);  
   }
+  //uncoment to draw RA motor in place
+  //translate([0,0,-18]) translate([0,tod/2+16+7,-14])rotate([0,0,180])motor();
 }
 module dec_motor_holder(){
 difference(){
@@ -128,13 +131,15 @@ module cap_frame(){
     union(){
       difference(){ // cap ring
         union(){
-          translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2,center=true,$fn=100);
+          translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2+0.5,center=true,$fn=100);
           s=7; // enlargment fix
-          translate([tod/2-5,-5,bw+2-s])cube([10,10,ms-2+s]);
-          translate([-tod/2-5,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
-          rotate([0,0,-30])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
-          rotate([0,0,90])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
-          rotate([0,0,210])translate([tod/2-5,-5,bw+2-s])cube([10,10,41]);
+          translate([tod/2,-5,bw+2-s])cube([10,10,ms-2+s]);
+            translate([ tod/2   ,-5,ms-20])rotate([0,-18,0])cube([10,10,12]);
+          translate([-tod/2-10,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
+            translate([-tod/2,-5,ms-20])rotate([0,18,0])translate([-10,0,0])cube([10,10,12]);
+          rotate([0,0,-30])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
+          rotate([0,0,90])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
+          rotate([0,0,210])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
           difference(){   //  hollow plate holding RA gear
             cylinder(h=wht,d=ra_d+1);
             for (i = [0:30:360]) { 
@@ -144,8 +149,8 @@ module cap_frame(){
             translate([0,0,-1])cylinder(h=wht+2,d=tod+1);
           }
         }
-        translate([0,0,h1/2])cylinder(h=h1,d=tod+1,center=true,$fn=100);
-        translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm,center=true,$fn=100);
+        translate([0,0,h1/2])cylinder(h=h1+4.5,d=tod+1.5,center=true,$fn=100);
+        translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm+0.5,center=true,$fn=100);
         ra_bearing(1,a=1);
         ra_bearing(bs,a=0);
       }  
@@ -157,6 +162,7 @@ module cap_frame(){
     }
     translate([0,0,ms])rotate([0,90,0])                       // dec bearing axis 
     cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100);
+    //ra_bearing(1,a=1);
   }
 }
 
