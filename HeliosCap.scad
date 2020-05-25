@@ -23,7 +23,7 @@ bt=5;          // 625zz bearing thickness
 brd=7.8;       // 625zz bearing rotating diameter
 bw=7;          // GT2 belt width
 dec_teeth=150; // GT2 teeth on DEC gear
-ra_teeth=60*4; // GT2 teeth on RA gear
+ra_teeth=240; // GT2 teeth on RA gear
 ra_d=2*ra_teeth/PI;   // ra diameter. l=ra_teeth*2 in GT2. l=2*PI*r  r=ra_teeth*2/(2PI)*2
 wd1=15.25;
 wd2=13;
