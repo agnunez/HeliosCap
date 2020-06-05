@@ -44,20 +44,22 @@ bs=1.2;  // bearing scale to allocate hollow room in cap for play
 //***mirror_retainer();
 //fake_bearing();
 //**translate([0,0,ms])rotate([-ma,0,0])mirror_assembly(); // flat 1st surface mirror
+//motor();
 //translate([-35.3,0,ms+46])rotate([-90,180,-90])motor(); // dec motor
 //translate ([0,0,ms]) beam();  // beam toward telescope lense
 //translate ([0,0,ms]) rotate([-ma*2,0,0]) beam(); // beam toward Sun
 //pulley20();  
 //translate([0,tod/2+16,-32])motor(); // ra motor
-//***translate([0,0,h1])telescope();  // uncomment to draw OTA
+//translate([0,0,h1])telescope();  //*** uncomment to draw OTA
 //ra_bearing(1,a=1);
 cap_frame();           //*** uncomment to generate cap_frame main gear stl
 //ra_motor_holder();     //*** uncoment to generat RA motor holder stl
-
+//echo((tod+wd1)/2);
+//mirrorarms();
 
 module ra_bearing(s,a){ 
    translate([0,0,wht])union(){
-    rotate([0,0,30])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
+    rotate([0,0, 30])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
     rotate([0,0,150])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
     rotate([0,0,270])translate([(tod+wd1)/2,0,0])vslot_wheel(s,a);
   }
@@ -123,6 +125,49 @@ difference(){
   //translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
 }
 
+module mirrorarms(){
+  //dec_motor_holder();
+  //gt2_belt_arc(ra_teeth,bw, 1, 360, 2);
+  difference(){
+    union(){
+      difference(){ // cap ring
+        union(){
+          s=7; // enlargment fix
+          translate([tod/2,-5,bw+2-s])cube([10,10,ms-2+s]);
+          translate([ tod/2   ,-5,ms-20])rotate([0,-18,0])cube([10,10,12]);
+          translate([-tod/2-10,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
+          translate([-tod/2,-5,ms-20])rotate([0,18,0])translate([-10,0,0])cube([10,10,12]);
+        }
+        translate([0,0,h1/2])cylinder(h=h1+4.5,d=tod+1.5,center=true,$fn=100);
+        translate([0,0,h1/2])cylinder(h=h1+20,d=mod+bm+0.5,center=true,$fn=100);
+        ra_bearing(1,a=1);
+        ra_bearing(bs,a=0);
+      }  
+      translate([0,0,ms])rotate([-ma,0,0]) 
+      union(){
+        translate([mod/2+0.5,0,0])rotate([0,90,0]) bearing_caps();  // dec bearing holders
+        translate([-mod/2-0.5,0,0])rotate([0,-90,0]) bearing_caps();   
+      }
+    }
+    translate([0,0,ms])rotate([0,90,0])                       // dec bearing axis 
+    cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100);
+    //ra_bearing(1,a=1);
+  }
+
+#difference(){
+  union(){
+    translate([-60.9,-5,ms+9.6])rotate([0,62,0])translate([0,0,1])cube([5,10,100]);
+    translate([-17.5,0,ms+47])rotate([0,90,0])cylinder(h=3,d=44,center=true,$fn=100);
+      
+  }
+ translate([-20.9,-24,ms+50])cube([5,50,21]);
+ translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
+ translate([-17.5,0,ms+47])rotate([0,90,0])translate([0,0,26.5])cylinder(h=50,d=44,center=true,$fn=100);
+ translate([0,0,ms])rotate([0,90,0])cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100); 
+}
+  //translate([-35.3,0,ms+46])rotate([-90,180,-90])motor();
+
+}    
 
 module cap_frame(){
   dec_motor_holder();
@@ -134,9 +179,9 @@ module cap_frame(){
           translate([0,0,(h1+w1)/2])cylinder(h=h1+w1,d=tod+w1*2+0.5,center=true,$fn=100);
           s=7; // enlargment fix
           translate([tod/2,-5,bw+2-s])cube([10,10,ms-2+s]);
-            translate([ tod/2   ,-5,ms-20])rotate([0,-18,0])cube([10,10,12]);
+          translate([ tod/2   ,-5,ms-20])rotate([0,-18,0])cube([10,10,12]);
           translate([-tod/2-10,-5,bw+2-s])cube([10,10,ms+8-bw+s]);
-            translate([-tod/2,-5,ms-20])rotate([0,18,0])translate([-10,0,0])cube([10,10,12]);
+          translate([-tod/2,-5,ms-20])rotate([0,18,0])translate([-10,0,0])cube([10,10,12]);
           rotate([0,0,-30])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
           rotate([0,0,90])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
           rotate([0,0,210])translate([tod/2,-5,bw+2-s])cube([11,10,41]);
@@ -160,7 +205,7 @@ module cap_frame(){
         translate([-mod/2-0.5,0,0])rotate([0,-90,0]) bearing_caps();   
       }
     }
-    translate([0,0,ms])rotate([0,90,0])                       // dec bearing axis 
+    translate([0,0,ms])rotate([0,90,0])             // dec bearing axis 
     cylinder(h=mod+bt+bm+10,d=bod+0.5,center=true,$fn=100);
     //ra_bearing(1,a=1);
   }
@@ -296,7 +341,7 @@ module motor(){
     color("green")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(2,d=9);
     color("red")translate([0,-motd/2+10.75-9.2/2,moth]) cylinder(10,d=4.91);
   }
-  translate([0,-motd/2+10.75-9.2/2,moth+2])pulley20();  
+  //translate([0,-motd/2+10.75-9.2/2,moth+2])pulley20();  
 }
 module pulley20(){
     $fn=100;
